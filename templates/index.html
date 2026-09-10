@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naver搜索趋势仪表盘</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Naver搜索趋势仪表盘</h1>
+        <p class="subtitle">韩国女装品牌搜索趋势分析工具</p>
+    </div>
+
+    <div class="api-quota-bar" id="apiQuotaBar">
+        <div class="quota-header">
+            <span class="quota-title">API使用量</span>
+            <span class="quota-numbers" id="quotaNumbers">加载中...</span>
+        </div>
+        <div class="quota-progress-container">
+            <div class="quota-progress" id="quotaProgress" style="width:0%"></div>
+        </div>
+        <div class="quota-footer">
+            <span id="quotaDetail">--</span>
+            <span id="quotaReset">每日0点(KST)重置</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="card">
+                <h2>1. API设置</h2>
+                <div class="form-group">
+                    <label>Client ID</label>
+                    <input type="text" id="clientId" value="tjohj8mjqs" placeholder="Naver API Hub Client ID">
+                </div>
+                <div class="form-group">
+                    <label>Client Secret</label>
+                    <input type="password" id="clientSecret" value="25ortQrcva85VTH9b5XWrxdgOoYmmflXUf9Cgjmy" placeholder="Naver API Hub Client Secret">
+                </div>
+                <button class="btn btn-small" onclick="saveApiKey()">保存API密钥</button>
+                <span id="apiSaved" class="saved-badge" style="display:none;">已保存</span>
+            </div>
+
+            <div class="card">
+                <h2>2. 查询设置</h2>
+                <div class="form-group">
+                    <label>查询期间</label>
+                    <div class="date-row">
+                        <input type="date" id="startDate">
+                        <span>~</span>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>时间单位</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="timeUnit" value="date"> 日</label>
+                        <label><input type="radio" name="timeUnit" value="week"> 周</label>
+                        <label><input type="radio" name="timeUnit" value="month" checked> 月</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>3. 品牌输入</h2>
+                <div class="form-group">
+                    <label>锚点品牌（基准品牌）</label>
+                    <input type="text" id="anchor" value="musinsa" placeholder="标准化基准品牌">
+                    <small class="hint">该品牌设为100基准。所有品牌可在同一尺度下比较。</small>
+                </div>
+                <div class="form-group">
+                    <label>品牌列表（每行一个）</label>
+                    <textarea id="brands" rows="8" placeholder="musinsa&#10;Wconcept&#10;chancechance&#10;..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>或从文件导入（.xlsx, .csv, .txt）</label>
+                    <input type="file" id="brandFile" accept=".xlsx,.csv,.txt" onchange="uploadBrands(this)">
+                    <div id="uploadResult" class="upload-result"></div>
+                </div>
+                <div class="brand-count-info" id="brandCountInfo"></div>
+            </div>
+
+            <div class="card">
+                <h2>4. 关键词预览</h2>
+                <div class="form-group">
+                    <label>自动生成的搜索关键词</label>
+                    <small class="hint">每个品牌自动生成：品牌名 + 大写英文名 + 韩文名</small>
+                    <button class="btn btn-small" onclick="previewKeywords()">预览关键词</button>
+                </div>
+                <div id="keywordPreview" class="keyword-preview"></div>
+            </div>
+
+            <div class="card">
+                <h2>5. 执行</h2>
+                <div class="api-estimate" id="apiEstimate"></div>
+                <button class="btn btn-primary" id="searchBtn" onclick="startSearch()">开始趋势查询</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="card" id="progressCard" style="display:none;">
+                <h2>进度</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width:0%"></div>
+                </div>
+                <div class="progress-text" id="progressText">准备中...</div>
+                <div class="api-counter" id="apiCounter"></div>
+            </div>
+
+            <div class="card" id="errorCard" style="display:none;">
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <div class="card" id="resultsCard" style="display:none;">
+                <h2>查询结果</h2>
+                <div class="result-actions">
+                    <button class="btn btn-download" onclick="downloadExcel()">下载Excel（含透视数据）</button>
+                </div>
+                <div class="table-container">
+                    <table id="resultTable">
+                        <thead><tr id="tableHeader"></tr></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
