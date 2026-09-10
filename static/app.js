@@ -262,7 +262,7 @@ function updateQuota() {
             }
 
             numbers.textContent = `${data.used} / ${data.total} (${pct}%)`;
-            detail.textContent = `剩余 ${data.remaining} 次 | 超过1000次需付费 (约0.5韩元/次)`;
+            detail.textContent = `剩余 ${data.remaining} 次/日 | 每日1000次 (可调) | 月上限50000次`;
         })
         .catch(err => {
             document.getElementById('quotaNumbers').textContent = '获取失败';
